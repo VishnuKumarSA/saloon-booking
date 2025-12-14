@@ -1,0 +1,451 @@
+/* ========== WEEK/DAY TIME GRID VIEW ========== */
+.fc-timegrid-slot {
+    height: 80px !important;
+}
+
+.fc-timegrid-event {
+    min-height: 70px !important;
+}
+
+.fc-timegrid-event .fc-event-main {
+    padding: 10px 5px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+}
+
+/* ========== MONTH VIEW ========== */
+.fc-daygrid-day {
+    min-height: 180px !important;
+}
+
+.fc-daygrid-day-frame {
+    min-height: 180px !important;
+    height: auto !important;
+}
+
+.fc-daygrid-day-events {
+    min-height: 140px !important;
+}
+
+.fc-daygrid-event {
+    padding: 6px 8px !important;
+    margin: 3px 4px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    border-radius: 4px !important;
+    white-space: normal !important;
+    height: auto !important;
+}
+
+/* ========== LIST VIEW STYLES ========== */
+.fc-list {
+    background: #fff !important;
+}
+
+.fc-list-day-cushion {
+    background: #f8f9fa !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    padding: 10px 15px !important;
+    border-bottom: 2px solid #dee2e6 !important;
+}
+
+.fc-list-table {
+    border: none !important;
+}
+
+.fc-list-event {
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.fc-list-event td {
+    padding: 15px !important;
+    border-bottom: 1px solid #eee !important;
+}
+
+.fc-list-event-time {
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    min-width: 100px !important;
+}
+
+.fc-list-event-graphic {
+    padding-right: 15px !important;
+}
+
+.fc-list-event-dot {
+    width: 14px !important;
+    height: 14px !important;
+    border-width: 3px !important;
+}
+
+.fc-list-event-title {
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    padding-left: 10px !important;
+}
+
+/* List view - Available slots (GREEN) */
+.fc-list-event.available {
+    background-color: #d4edda !important;
+}
+
+.fc-list-event.available:hover {
+    background-color: #c3e6cb !important;
+    cursor: pointer !important;
+}
+
+.fc-list-event.available .fc-list-event-dot {
+    border-color: #28a745 !important;
+    background-color: #28a745 !important;
+}
+
+.fc-list-event.available .fc-list-event-title {
+    color: #155724 !important;
+    font-weight: 700 !important;
+}
+
+.fc-list-event.available .fc-list-event-time {
+    color: #155724 !important;
+}
+
+/* List view - Fully Booked slots (RED) */
+.fc-list-event.fully-booked {
+    background-color: #f8d7da !important;
+}
+
+.fc-list-event.fully-booked:hover {
+    background-color: #f5c6cb !important;
+    cursor: not-allowed !important;
+}
+
+.fc-list-event.fully-booked .fc-list-event-dot {
+    border-color: #dc3545 !important;
+    background-color: #dc3545 !important;
+}
+
+.fc-list-event.fully-booked .fc-list-event-title {
+    color: #721c24 !important;
+    font-weight: 700 !important;
+}
+
+.fc-list-event.fully-booked .fc-list-event-time {
+    color: #721c24 !important;
+}
+
+/* List view - Past slots (GRAY) */
+.fc-list-event.past-slot {
+    background-color: #e9ecef !important;
+    opacity: 0.7 !important;
+}
+
+.fc-list-event.past-slot:hover {
+    background-color: #e9ecef !important;
+    cursor: not-allowed !important;
+}
+
+.fc-list-event.past-slot .fc-list-event-dot {
+    border-color: #6c757d !important;
+    background-color: #6c757d !important;
+}
+
+.fc-list-event.past-slot .fc-list-event-title {
+    color: #6c757d !important;
+    font-weight: 600 !important;
+    text-decoration: line-through !important;
+}
+
+.fc-list-event.past-slot .fc-list-event-time {
+    color: #6c757d !important;
+    text-decoration: line-through !important;
+}
+
+/* ========== GRID VIEWS (WEEK/DAY/MONTH) ========== */
+/* Available slots - GREEN */
+.fc-event.available {
+    background: linear-gradient(135deg, #28a745, #34ce57) !important;
+    border: 2px solid #1e7e34 !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+}
+
+.fc-event.available .fc-event-main {
+    color: #ffffff !important;
+}
+
+.fc-event.available .fc-event-title {
+    color: #ffffff !important;
+}
+
+.fc-event.available:hover {
+    background: linear-gradient(135deg, #218838, #28a745) !important;
+    transform: scale(1.02);
+    transition: all 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.fc-event.available small {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+/* Almost Full slots - ORANGE/WARNING */
+.fc-event.available.almost-full {
+    background: linear-gradient(135deg, #ff9800, #ffa726) !important;
+    border: 2px solid #f57c00 !important;
+    animation: pulse-warning 2s infinite;
+}
+
+.fc-event.available.almost-full:hover {
+    background: linear-gradient(135deg, #fb8c00, #ff9800) !important;
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+}
+
+.fc-event.available.almost-full .text-warning {
+    color: #fff !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes pulse-warning {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(255, 152, 0, 0);
+    }
+}
+
+/* List view - Almost Full */
+.fc-list-event.available.almost-full {
+    background-color: #fff3e0 !important;
+    border-left: 4px solid #ff9800 !important;
+}
+
+.fc-list-event.available.almost-full:hover {
+    background-color: #ffe0b2 !important;
+}
+
+.fc-list-event.available.almost-full .fc-list-event-dot {
+    border-color: #ff9800 !important;
+    background-color: #ff9800 !important;
+    animation: pulse-dot 1.5s infinite;
+}
+
+.fc-list-event.available.almost-full .fc-list-event-title {
+    color: #e65100 !important;
+    font-weight: 700 !important;
+}
+
+.fc-list-event.available.almost-full .fc-list-event-time {
+    color: #e65100 !important;
+}
+
+@keyframes pulse-dot {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+/* Fully booked slots - RED */
+.fc-event.fully-booked {
+    background: linear-gradient(135deg, #dc3545, #e4606d) !important;
+    border: 2px solid #a71d2a !important;
+    color: #ffffff !important;
+    pointer-events: none !important;
+    opacity: 0.9;
+    cursor: not-allowed !important;
+    font-weight: bold !important;
+    font-size: 13px !important;
+}
+
+.fc-event.fully-booked .fc-event-main {
+    color: #ffffff !important;
+}
+
+.fc-event.fully-booked .fc-event-title {
+    color: #ffffff !important;
+}
+
+/* Past slots - GRAY */
+.fc-event.past-slot {
+    background: linear-gradient(135deg, #adb5bd, #ced4da) !important;
+    border: 2px dashed #6c757d !important;
+    color: #495057 !important;
+    pointer-events: none !important;
+    opacity: 0.6;
+    cursor: not-allowed !important;
+}
+
+.fc-event.past-slot .fc-event-main {
+    color: #495057 !important;
+}
+
+.fc-event.past-slot .fc-event-title {
+    color: #495057 !important;
+    text-decoration: line-through !important;
+}
+
+/* ========== GENERAL STYLES ========== */
+.fc-toolbar-title {
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+}
+
+.fc-button {
+    font-weight: 600 !important;
+    text-transform: capitalize !important;
+}
+
+.fc-day-today {
+    background-color: #fffbe6 !important;
+}
+
+.fc-event-title {
+    color: inherit !important;
+    font-weight: inherit !important;
+}
+
+.fc-event-resizer {
+    display: none !important;
+}
+
+.fc-timegrid-event {
+    margin: 4px 6px !important;
+}
+
+.fc-timegrid-event .fc-event-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* ========== BOOKING MODAL STYLES ========== */
+#bookingModal .modal-dialog {
+    max-width: 500px;
+}
+
+#bookingModal .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+#bookingModal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 20px 24px;
+    border-bottom: none;
+}
+
+#bookingModal .modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+#bookingModal .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+}
+
+#bookingModal .modal-body {
+    padding: 30px 24px;
+}
+
+#bookingModal .form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+#bookingModal .form-control,
+#bookingModal .form-select {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+#bookingModal .form-control:focus,
+#bookingModal .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+    outline: none;
+}
+
+#bookingModal .form-control::placeholder {
+    color: #999;
+}
+
+#bookingModal .mb-3 {
+    margin-bottom: 20px !important;
+}
+
+#bookingModal .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #e9ecef;
+    border-radius: 0 0 12px 12px;
+}
+
+#bookingModal .btn {
+    padding: 12px 28px;
+    font-weight: 600;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+#bookingModal .btn-secondary {
+    background-color: #6c757d;
+    border: none;
+}
+
+#bookingModal .btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+#bookingModal .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+#bookingModal .btn-primary:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #63408a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+#bookingModal .btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Select dropdown styling */
+#bookingModal select.form-control,
+#bookingModal select.form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}

@@ -20,86 +20,79 @@ class BookingController extends Controller
 
         $startDate = Carbon::parse($request->start)->startOfDay();
         $endDate = Carbon::parse($request->end)->startOfDay();
-        $now = Carbon::now();
+        
+        // Use Asia/Kolkata timezone (or your specific timezone)
+        $now = Carbon::now('Asia/Kolkata');
 
         while ($startDate < $endDate) {
 
-            // ❌ Skip past dates (before today)
-            if ($startDate->lt(Carbon::today())) {
+            // Skip PAST days only (days before today, not including today)
+            if ($startDate->lt($now->copy()->startOfDay())) {
                 $startDate->addDay();
                 continue;
             }
 
-            // ❌ Friday = Holiday
+            // Skip Friday (Holiday)
             if ($startDate->isFriday()) {
                 $startDate->addDay();
                 continue;
             }
 
-            $hasFutureSlot = false; // 🔑 IMPORTANT FLAG
+            // Loop through hours: 9 AM to 5 PM (last slot is 5 PM)
+            for ($hour = 9; $hour < 18; $hour++) {
 
-            $slotTime = Carbon::createFromTime(9, 0);
-            $endTime = Carbon::createFromTime(18, 0);
-
-            while ($slotTime < $endTime) {
-
+                // Create the exact datetime for this slot in Asia/Kolkata timezone
                 $slotDateTime = Carbon::create(
                     $startDate->year,
                     $startDate->month,
                     $startDate->day,
-                    $slotTime->hour,
-                    $slotTime->minute,
-                    0
+                    $hour,
+                    0,
+                    0,
+                    'Asia/Kolkata'
                 );
 
-                // ❌ Skip past time slots for TODAY
-                if ($slotDateTime->lte($now)) {
-                    $slotTime->addHour();
-                    continue;
-                }
+                // Check if this slot has passed (slot time is less than or equal to current time)
+                $isPastSlot = $slotDateTime->lte($now);
 
-                $hasFutureSlot = true;
-
-                $booked = Booking::whereDate(
-                    'booking_date',
-                    $startDate->toDateString()
-                )->where(
-                        'start_time',
-                        $slotTime->format('H:i:s')
-                    )->count();
+                // Count bookings for this slot
+                $booked = Booking::whereDate('booking_date', $startDate->toDateString())
+                    ->where('start_time', sprintf('%02d:00:00', $hour))
+                    ->count();
 
                 $available = max(0, 5 - $booked);
 
+                // Determine slot state
+                if ($isPastSlot) {
+                    // Past slots - gray, disabled
+                    $className = 'past-slot';
+                    $displayAvailable = 0;
+                    $isDisabled = true;
+                } elseif ($available === 0) {
+                    // Fully booked - red
+                    $className = 'fully-booked';
+                    $displayAvailable = 0;
+                    $isDisabled = false;
+                } elseif ($available <= 2) {
+                    // Almost full - orange/warning (1 or 2 slots left)
+                    $className = 'available almost-full';
+                    $displayAvailable = $available;
+                    $isDisabled = false;
+                } else {
+                    // Available - green (3+ slots)
+                    $className = 'available';
+                    $displayAvailable = $available;
+                    $isDisabled = false;
+                }
+
                 $events[] = [
-                    'title' => $available === 0
-                        ? 'CLOSED'
-                        : "$available/5 Available",
-
-                    // ✅ Correct ISO local time
-                    'start' => $startDate->format('Y-m-d') . 'T' . $slotTime->format('H:i:s'),
-
-                    'classNames' => [
-                        $available === 0 ? 'fully-booked' : 'available'
+                    'title' => $slotDateTime->format('h:i A'),
+                    'start' => $slotDateTime->format('Y-m-d\TH:i:s'),
+                    'classNames' => [$className],
+                    'extendedProps' => [
+                        'available' => $displayAvailable,
+                        'disabled' => $isDisabled,
                     ],
-
-                    'extendedProps' => [
-                        'available' => $available
-                    ]
-                ];
-
-                $slotTime->addHour();
-            }
-
-            // ✅ FORCE TODAY TO APPEAR
-            if ($startDate->isToday() && !$hasFutureSlot) {
-                $events[] = [
-                    'title' => 'No slots available today',
-                    'start' => $startDate->format('Y-m-d') . 'T12:00:00',
-                    'allDay' => true,
-                    'classNames' => ['fully-booked'],
-                    'extendedProps' => [
-                        'available' => 0
-                    ]
                 ];
             }
 
@@ -108,7 +101,6 @@ class BookingController extends Controller
 
         return response()->json($events);
     }
-
 
     public function store(Request $request)
     {
