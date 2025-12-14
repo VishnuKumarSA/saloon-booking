@@ -45,21 +45,8 @@ A salon booking system built using **Laravel 12** and **FullCalendar** that allo
 ### 📆 Weekly View
 Shows available and closed slots with clear color indication.
 
-![Weekly View](screenshots/weekly-view.png)
+![Weekly View](screenshots/weekly.png)
 
----
-
-### 📅 Day View
-Displays only upcoming slots for the selected day.
-
-![Day View](screenshots/day-view.png)
-
----
-
-### 📋 List View
-Clean and readable list of upcoming available slots.
-
-![List View](screenshots/list-view.png)
 
 ---
 
