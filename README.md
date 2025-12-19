@@ -47,14 +47,6 @@ Shows available and closed slots with clear color indication.
 
 ![Weekly View](screenshots/weekly.png)
 
-
----
-
-### 🔴 Fully Booked Slot
-Closed slots are highlighted in red and cannot be booked.
-
-![Fully Booked Slot](screenshots/fully-booked.png)
-
 ---
 
 ## ⚙️ Installation & Setup
