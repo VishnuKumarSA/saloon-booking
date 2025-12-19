@@ -22,6 +22,7 @@
                 <div class="mb-3">
                     <label for="mobile" class="form-label">Mobile Number</label>
                     <input type="tel" class="form-control" id="mobile" placeholder="Enter mobile number" required>
+                    <div><span id = 'mobile_error'>  </span></div>
                 </div>
                 <div class="mb-3">
                     <label for="beautician" class="form-label">Select Beautician</label>

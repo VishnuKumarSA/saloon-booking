@@ -4,163 +4,140 @@ let modalInstance;
 document.addEventListener('DOMContentLoaded', function () {
 
     let calendar = new FullCalendar.Calendar(
-        document.getElementById('calendar'), {
+    document.getElementById('calendar'), {
 
-        initialView: 'timeGridWeek',
-        height: 'auto',
-        contentHeight: 'auto',
-        expandRows: true,
-        timeZone: 'local',
-        slotLabelFormat: {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        },
+    initialView: 'timeGridWeek',
+    height: 'auto',
+    expandRows: true,
+    timeZone: 'local',
 
-        eventTimeFormat: {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        },
+    slotMinTime: '09:00:00',
+    slotMaxTime: '18:00:00',
+    slotDuration: '01:00:00',
+    allDaySlot: false,
 
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-        },
+    initialDate: new Date(),
+    nowIndicator: true,
 
-        slotMinTime: '09:00:00',
-        slotMaxTime: '18:00:00',
-        slotDuration: '01:00:00',
-        allDaySlot: false,
+    headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+    },
 
-        // Set initial date to today
-        initialDate: new Date(),
+    events: function (info, success, failure) {
+        $.get('/slots', {
+            start: info.startStr,
+            end: info.endStr
+        })
+        .done(success)
+        .fail(failure);
+    },
 
-        // Show current time indicator
-        nowIndicator: true,
+    eventDidMount: function (info) {
 
-        events: function (info, success, failure) {
-            $.get('/slots', {
-                start: info.startStr,
-                end: info.endStr
-            })
-                .done(function (events) {
-                    console.log('Loaded events:', events);
-                    success(events);
-                })
-                .fail(function (error) {
-                    console.error('Error loading events:', error);
-                    failure(error);
-                });
-        },
+        const available = info.event.extendedProps.available ?? 0;
+        const disabled  = info.event.extendedProps.disabled ?? false;
+        const isHoliday = info.event.extendedProps.holiday ?? false;
+        const viewType  = info.view.type;
 
-        eventDidMount: function (info) {
-
-            const available = info.event.extendedProps.available ?? 0;
-            const disabled = info.event.extendedProps.disabled ?? false;
-            const viewType = info.view.type;
-
-            if (viewType === 'timeGridWeek' || viewType === 'timeGridDay') {
-
-                const main = info.el.querySelector('.fc-event-main');
-                if (!main) return;
-
-                if (disabled) {
-                    main.innerHTML = `
-                <div class="text-center">
-                    <strong>${info.event.title}</strong><br>
-                    <small>Past</small>
-                </div>
-            `;
-                    info.el.style.pointerEvents = 'none';
-                    info.el.style.cursor = 'not-allowed';
-                }
-                else if (available === 0) {
-                    main.innerHTML = `
-                <div class="text-center">
-                    <strong>${info.event.title}</strong><br>
-                    <small>Fully booked</small>
-                </div>
-            `;
-                    info.el.style.pointerEvents = 'none';
-                    info.el.style.cursor = 'not-allowed';
-                }
-                else if (available <= 2) {
-                    // Almost full - show warning
-                    main.innerHTML = `
-                <div class="text-center">
-                    <strong>${info.event.title}</strong><br>
-                    <span class="text-warning">⚠️ ${available}/5 Available</span><br>
-                    <small>Book now!</small>
-                </div>
-            `;
-                    // Add pulsing animation class
-                    info.el.classList.add('almost-full');
-                }
-                else {
-                    main.innerHTML = `
-                <div class="text-center">
-                    <strong>${info.event.title}</strong><br>
-                    <span>${available}/5 Available</span><br>
-                    <small>Click to book</small>
-                </div>
-            `;
-                }
+        /* ========= HOLIDAY LABEL ========= */
+        if (isHoliday) {
+            const col = info.el.closest('.fc-timegrid-col');
+            if (col && !col.querySelector('.holiday-label')) {
+                const label = document.createElement('div');
+                label.className = 'holiday-label';
+                label.innerText = 'Holiday';
+                col.style.position = 'relative';
+                col.appendChild(label);
             }
-
-            // List view
-            if (viewType.startsWith('list')) {
-                const titleEl = info.el.querySelector('.fc-list-event-title');
-                if (!titleEl) return;
-
-                if (disabled) {
-                    titleEl.innerHTML = `<strong>${info.event.title}</strong> - Past`;
-                    info.el.style.pointerEvents = 'none';
-                    info.el.style.cursor = 'not-allowed';
-                } else if (available === 0) {
-                    titleEl.innerHTML = `<strong>${info.event.title}</strong> - Fully booked`;
-                    info.el.style.pointerEvents = 'none';
-                    info.el.style.cursor = 'not-allowed';
-                } else if (available <= 2) {
-                    titleEl.innerHTML = `<strong>${info.event.title}</strong> - ⚠️ Only ${available}/5 Available - Book now!`;
-                    info.el.classList.add('almost-full');
-                } else {
-                    titleEl.innerHTML = `<strong>${info.event.title}</strong> - ${available}/5 Available`;
-                }
-            }
-        },
-
-
-        eventClick: function (info) {
-            const available = info.event.extendedProps.available || 0;
-            const disabled = info.event.extendedProps.disabled || false;
-
-            // Don't allow booking disabled/past slots
-            if (disabled) {
-                alert('Cannot book past time slots.');
-                return;
-            }
-
-            // Don't allow booking if fully booked
-            if (available === 0) {
-                alert('This slot is fully booked. Please select another time.');
-                return;
-            }
-
-            // Double-check if slot is in the past
-            const now = new Date();
-            if (info.event.start < now) {
-                alert('Cannot book past time slots.');
-                return;
-            }
-
-            selected = info.event.start;
-            loadBeauticians();
+            return; // no further rendering
         }
-    });
 
-    calendar.render();
+        /* ========= PAST SLOT ========= */
+        if (disabled) {
+            const main = info.el.querySelector('.fc-event-main');
+            if (main) {
+                main.innerHTML = `
+                    <div class="text-center">
+                        <strong>${info.event.title}</strong><br>
+                        <small>Past</small>
+                    </div>
+                `;
+            }
+            info.el.style.pointerEvents = 'none';
+            info.el.style.cursor = 'not-allowed';
+            return;
+        }
+
+        /* ========= TIME GRID ========= */
+        if (viewType === 'timeGridWeek' || viewType === 'timeGridDay') {
+
+            const main = info.el.querySelector('.fc-event-main');
+            if (!main) return;
+
+            if (available === 0) {
+                main.innerHTML = `
+                    <div class="text-center">
+                        <strong>${info.event.title}</strong><br>
+                        <small>Fully booked</small>
+                    </div>
+                `;
+                info.el.style.pointerEvents = 'none';
+                info.el.style.cursor = 'not-allowed';
+            }
+            else if (available <= 2) {
+                main.innerHTML = `
+                    <div class="text-center">
+                        <strong>${info.event.title}</strong><br>
+                        <span class="text-warning">⚠️ ${available}/5 Available</span><br>
+                        <small>Book now!</small>
+                    </div>
+                `;
+                info.el.classList.add('almost-full');
+            }
+            else {
+                main.innerHTML = `
+                    <div class="text-center">
+                        <strong>${info.event.title}</strong><br>
+                        <span>${available}/5 Available</span><br>
+                        <small>Click to book</small>
+                    </div>
+                `;
+            }
+        }
+
+        /* ========= LIST VIEW ========= */
+        if (viewType.startsWith('list')) {
+            const titleEl = info.el.querySelector('.fc-list-event-title');
+            if (!titleEl) return;
+
+            if (available === 0) {
+                titleEl.innerHTML = `<strong>${info.event.title}</strong> - Fully booked`;
+            } else if (available <= 2) {
+                titleEl.innerHTML = `<strong>${info.event.title}</strong> - ⚠️ Only ${available}/5 Available`;
+            } else {
+                titleEl.innerHTML = `<strong>${info.event.title}</strong> - ${available}/5 Available`;
+            }
+        }
+    },
+
+    eventClick: function (info) {
+        const available = info.event.extendedProps.available || 0;
+        const disabled  = info.event.extendedProps.disabled || false;
+
+        if (disabled || available === 0 || info.event.start < new Date()) {
+            alert('This slot cannot be booked.');
+            return;
+        }
+
+        selected = info.event.start;
+        loadBeauticians();
+    }
+});
+
+calendar.render();
+
 
     $('#confirmBooking').click(function () {
 
@@ -184,6 +161,9 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        $('#mobile_error').removeClass('text-danger');
+        $('#mobile').removeClass('input-error');
+
         // Disable button to prevent double submission
         $(this).prop('disabled', true).text('Booking...');
 
@@ -200,16 +180,31 @@ document.addEventListener('DOMContentLoaded', function () {
                     alert('Booking confirmed successfully!');
                     location.reload();
                 } else {
-                    alert('Booking failed: ' + (response.message || 'Unknown error'));
+                    $('#mobile_error').addClass('text-danger');
+                    $('#mobile').addClass('input-error');
+                    $('#mobile').focus();
+                    $('#mobile_error').html((response.message));
                     $('#confirmBooking').prop('disabled', false).text('Book');
                 }
             })
             .fail(function (xhr) {
                 const error = xhr.responseJSON;
-                alert('Booking failed: ' + (error?.message || 'Please try again'));
+
+                $('#mobile_error').addClass('text-danger');
+                $('#mobile').addClass('input-error');
+                $('#mobile').focus();
+                $('#mobile_error').html((error?.message));
                 $('#confirmBooking').prop('disabled', false).text('Book');
             });
     });
+});
+
+$(document).on('click', '.fc-event.available', function () {
+    $('#mobile_error')
+        .removeClass('text-danger')
+        .text('');
+
+    $('#mobile').removeClass('input-error');
 });
 
 function loadBeauticians() {
@@ -247,11 +242,11 @@ function loadBeauticians() {
             alert('Booking modal not found. Please refresh the page.');
             return;
         }
-        
+
         if (modalInstance) {
             modalInstance.dispose();
         }
-        
+
         modalInstance = new bootstrap.Modal(modalEl, {
             backdrop: 'static',
             keyboard: false

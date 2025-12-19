@@ -214,9 +214,12 @@
 }
 
 @keyframes pulse-warning {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.7);
     }
+
     50% {
         box-shadow: 0 0 0 8px rgba(255, 152, 0, 0);
     }
@@ -248,10 +251,13 @@
 }
 
 @keyframes pulse-dot {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1);
         opacity: 1;
     }
+
     50% {
         transform: scale(1.2);
         opacity: 0.8;
@@ -449,3 +455,86 @@
     background-position: right 16px center;
     padding-right: 40px;
 }
+
+.input-error {
+    border: 1px solid #dc3545;
+}
+
+/* =========================
+   HOLIDAY BACKGROUND
+========================= */
+.holiday-bg {
+    background-color: #fde2e2 !important;
+}
+
+/* Centered Holiday text */
+.holiday-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px;
+    font-weight: 700;
+    color: #842029;
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+/* Remove slot borders on holiday */
+.fc-timegrid-col:has(.holiday-label) .fc-timegrid-slot {
+    border-color: transparent !important;
+}
+
+/* =========================
+   REMOVE YELLOW / TODAY HIGHLIGHTS
+========================= */
+.fc-timegrid-col.fc-day-today,
+.fc-timegrid-slot-lane,
+.fc-timegrid-bg-harness,
+.fc-day-fri {
+    background: transparent !important;
+}
+
+/* =========================
+   PAST DAYS (FULL COLUMN)
+========================= */
+.fc-day-past {
+    background-color: #f1f3f5 !important;
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* ❌ Ensure NO "Past" text inside grid */
+.fc-day-past::before,
+.fc-day-past::after {
+    content: none !important;
+}
+
+/* =========================
+   SHOW "Past" ONLY IN HEADER (ONE TIME)
+========================= */
+.fc-day-past .fc-col-header-cell-cushion::after {
+    content: " Past";
+    margin-left: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #9ca3af;
+}
+
+/* =========================
+   PAST SLOTS (TODAY ONLY)
+========================= */
+.past-slot {
+    background-color: #e5e7eb !important;
+    color: #6b7280 !important;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* =========================
+   REMOVE SLOT BORDER BLEED
+========================= */
+.holiday-bg ~ .fc-timegrid-slot-lane {
+    border-color: transparent !important;
+}
+

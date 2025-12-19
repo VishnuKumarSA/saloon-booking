@@ -20,28 +20,31 @@ class BookingController extends Controller
 
         $startDate = Carbon::parse($request->start)->startOfDay();
         $endDate = Carbon::parse($request->end)->startOfDay();
-        
-        // Use Asia/Kolkata timezone (or your specific timezone)
+
         $now = Carbon::now('Asia/Kolkata');
 
         while ($startDate < $endDate) {
 
-            // Skip PAST days only (days before today, not including today)
-            if ($startDate->lt($now->copy()->startOfDay())) {
-                $startDate->addDay();
-                continue;
-            }
-
-            // Skip Friday (Holiday)
+            // Friday = Holiday
             if ($startDate->isFriday()) {
+                $events[] = [
+                    'title' => 'Holiday',
+                    'start' => $startDate->copy()->setTime(9, 0)->format('Y-m-d\TH:i:s'),
+                    'end' => $startDate->copy()->setTime(18, 0)->format('Y-m-d\TH:i:s'),
+                    'display' => 'background',
+                    'classNames' => ['holiday-bg'],
+                    'extendedProps' => [
+                        'holiday' => true,
+                    ],
+                ];
+
                 $startDate->addDay();
                 continue;
             }
 
-            // Loop through hours: 9 AM to 5 PM (last slot is 5 PM)
+            // Slots 9 AM – 6 PM
             for ($hour = 9; $hour < 18; $hour++) {
 
-                // Create the exact datetime for this slot in Asia/Kolkata timezone
                 $slotDateTime = Carbon::create(
                     $startDate->year,
                     $startDate->month,
@@ -52,34 +55,27 @@ class BookingController extends Controller
                     'Asia/Kolkata'
                 );
 
-                // Check if this slot has passed (slot time is less than or equal to current time)
                 $isPastSlot = $slotDateTime->lte($now);
 
-                // Count bookings for this slot
                 $booked = Booking::whereDate('booking_date', $startDate->toDateString())
                     ->where('start_time', sprintf('%02d:00:00', $hour))
                     ->count();
 
                 $available = max(0, 5 - $booked);
 
-                // Determine slot state
                 if ($isPastSlot) {
-                    // Past slots - gray, disabled
                     $className = 'past-slot';
                     $displayAvailable = 0;
                     $isDisabled = true;
                 } elseif ($available === 0) {
-                    // Fully booked - red
                     $className = 'fully-booked';
                     $displayAvailable = 0;
                     $isDisabled = false;
                 } elseif ($available <= 2) {
-                    // Almost full - orange/warning (1 or 2 slots left)
                     $className = 'available almost-full';
                     $displayAvailable = $available;
                     $isDisabled = false;
                 } else {
-                    // Available - green (3+ slots)
                     $className = 'available';
                     $displayAvailable = $available;
                     $isDisabled = false;
@@ -140,6 +136,18 @@ class BookingController extends Controller
             ->where('start_time', $request->time)
             ->where('beautician_id', $request->beautician_id)
             ->exists();
+
+        $checkDuplicateCustomer = Booking::whereDate('booking_date', $request->date)
+            ->where('start_time', $request->time)
+            ->where('mobile', $request->mobile)
+            ->exists();
+
+        if ($checkDuplicateCustomer) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You already have a booking for this time slot'
+            ], 400);
+        }
 
         if ($beauticianBooked) {
             return response()->json([
