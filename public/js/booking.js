@@ -4,139 +4,252 @@ let modalInstance;
 document.addEventListener('DOMContentLoaded', function () {
 
     let calendar = new FullCalendar.Calendar(
-    document.getElementById('calendar'), {
+        document.getElementById('calendar'), {
 
-    initialView: 'timeGridWeek',
-    height: 'auto',
-    expandRows: true,
-    timeZone: 'local',
+        initialView: 'timeGridWeek',
+        height: 'auto',
+        expandRows: true,
+        timeZone: 'local',
 
-    slotMinTime: '09:00:00',
-    slotMaxTime: '18:00:00',
-    slotDuration: '01:00:00',
-    allDaySlot: false,
+        slotMinTime: '07:00:00',
+        slotMaxTime: '22:00:00',
+        slotDuration: '01:00:00',
+        allDaySlot: false,
 
-    initialDate: new Date(),
-    nowIndicator: true,
+        initialDate: new Date(),
+        nowIndicator: true,
 
-    headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-    },
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
 
-    events: function (info, success, failure) {
-        $.get('/slots', {
-            start: info.startStr,
-            end: info.endStr
-        })
-        .done(success)
-        .fail(failure);
-    },
+        datesSet: function (info) {
 
-    eventDidMount: function (info) {
+            const titleEl = document.getElementById('calendarTitle');
+            if (!titleEl) return;
 
-        const available = info.event.extendedProps.available ?? 0;
-        const disabled  = info.event.extendedProps.disabled ?? false;
-        const isHoliday = info.event.extendedProps.holiday ?? false;
-        const viewType  = info.view.type;
+            switch (info.view.type) {
 
-        /* ========= HOLIDAY LABEL ========= */
-        if (isHoliday) {
-            const col = info.el.closest('.fc-timegrid-col');
-            if (col && !col.querySelector('.holiday-label')) {
-                const label = document.createElement('div');
-                label.className = 'holiday-label';
-                label.innerText = 'Holiday';
-                col.style.position = 'relative';
-                col.appendChild(label);
+                case 'dayGridMonth':
+                    titleEl.innerText = 'Monthly Booking';
+                    titleEl.style.color = '#0d6efd';
+                    break;
+
+                case 'timeGridWeek':
+                    titleEl.innerText = 'Weekly Booking';
+                    titleEl.style.color = '#198754';
+                    break;
+
+                case 'timeGridDay':
+                    titleEl.innerText = 'Daily Booking';
+                    titleEl.style.color = '#1ab85eff';
+                    break;
+
+                case 'listWeek':
+                    titleEl.innerText = 'Booking List';
+                    titleEl.style.color = '#75db15ff';
+                    break;
+
+                default:
+                    titleEl.innerText = 'Booking Calendar';
             }
-            return; // no further rendering
-        }
+        },
 
-        /* ========= PAST SLOT ========= */
-        if (disabled) {
-            const main = info.el.querySelector('.fc-event-main');
-            if (main) {
-                main.innerHTML = `
+        dayCellDidMount: function (info) {
+
+            if (info.view.type !== 'dayGridMonth') return;
+
+            const bottom = info.el.querySelector('.fc-daygrid-day-bottom');
+            if (!bottom) return;
+
+            // Clear previous renders (important)
+            bottom.innerHTML = '';
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const cellDate = new Date(info.date);
+            cellDate.setHours(0, 0, 0, 0);
+
+            // ❌ Hide EVERYTHING for past dates (including holidays)
+            if (cellDate < today) return;
+
+            const isHoliday = info.date.getDay() === 5; // Friday
+
+            const summary = document.createElement('div');
+            summary.className = 'month-summary';
+
+            if (!isHoliday) {
+                 summary.innerHTML = `<span class="available-text">9 Slots Available</span>`;
+            } 
+            bottom.appendChild(summary);
+        },
+        dateClick: function (info) {
+
+            if (calendar.view.type === 'dayGridMonth') {
+
+                if (info.date.getDay() === 5) {
+                    alert('Holiday – booking not allowed');
+                    return;
+                }
+
+                calendar.changeView('timeGridDay', info.date);
+            }
+        },
+
+
+        events: function (info, success, failure) {
+            $.get('/slots', {
+                start: info.startStr,
+                end: info.endStr
+            })
+                .done(success)
+                .fail(failure);
+        },
+
+        eventDidMount: function (info) {
+
+            const available = info.event.extendedProps.available ?? 0;
+            const disabled = info.event.extendedProps.disabled ?? false;
+            const isHoliday = info.event.extendedProps.holiday ?? false;
+            const viewType = info.view.type;
+
+            /* ========= HOLIDAY LABEL ========= */
+            /* ========= HOLIDAY ========= */
+            if (isHoliday) {
+
+                const viewType = info.view.type;
+
+                // MONTH VIEW
+                if (viewType === 'dayGridMonth') {
+
+                    const timeEl = info.el.querySelector('.fc-event-time');
+                    if (timeEl) {
+                        timeEl.remove(); // removes "1p"
+                    }
+
+                    const dayCell = info.el.closest('.fc-daygrid-day-frame');
+                    if (dayCell && !dayCell.querySelector('.holiday-label-month')) {
+
+                        const label = document.createElement('div');
+                        label.className = 'holiday-label-month';
+                        label.innerText = 'Holiday';
+
+                        dayCell.appendChild(label);
+                    }
+
+                    info.el.style.display = 'none'; // hide default event
+                    return;
+                }
+
+                // WEEK / DAY VIEW
+                if (viewType === 'timeGridWeek' || viewType === 'timeGridDay') {
+
+                    const col = info.el.closest('.fc-timegrid-col');
+                    if (col && !col.querySelector('.holiday-label')) {
+
+                        const label = document.createElement('div');
+                        label.className = 'holiday-label';
+                        label.innerText = 'Holiday';
+
+                        col.style.position = 'relative';
+                        col.appendChild(label);
+                    }
+
+                    info.el.style.display = 'none';
+                    return;
+                }
+            }
+
+            /* ========= PAST SLOT ========= */
+            if (disabled) {
+                const main = info.el.querySelector('.fc-event-main');
+                if (main) {
+                    main.innerHTML = `
                     <div class="text-center">
                         <strong>${info.event.title}</strong><br>
                         <small>Past</small>
                     </div>
                 `;
-            }
-            info.el.style.pointerEvents = 'none';
-            info.el.style.cursor = 'not-allowed';
-            return;
-        }
-
-        /* ========= TIME GRID ========= */
-        if (viewType === 'timeGridWeek' || viewType === 'timeGridDay') {
-
-            const main = info.el.querySelector('.fc-event-main');
-            if (!main) return;
-
-            if (available === 0) {
-                main.innerHTML = `
-                    <div class="text-center">
-                        <strong>${info.event.title}</strong><br>
-                        <small>Fully booked</small>
-                    </div>
-                `;
+                }
                 info.el.style.pointerEvents = 'none';
                 info.el.style.cursor = 'not-allowed';
+                return;
             }
-            else if (available <= 2) {
-                main.innerHTML = `
+
+            /* ========= TIME GRID ========= */
+            if (viewType === 'timeGridWeek' || viewType === 'timeGridDay') {
+
+                const main = info.el.querySelector('.fc-event-main');
+                if (!main) return;
+
+                if (available === 0) {
+                    main.innerHTML = `
+                    <div class="text-center">
+                        <strong>${info.event.title}</strong><br>                        
+                    </div>
+                `;
+                    info.el.style.pointerEvents = 'none';
+                    info.el.style.cursor = 'not-allowed';
+                }
+                else if (available <= 2) {
+                    main.innerHTML = `
                     <div class="text-center">
                         <strong>${info.event.title}</strong><br>
                         <span class="text-warning">⚠️ ${available}/5 Available</span><br>
                         <small>Book now!</small>
                     </div>
                 `;
-                info.el.classList.add('almost-full');
-            }
-            else {
-                main.innerHTML = `
+                    info.el.classList.add('almost-full');
+                }
+                else {
+                    main.innerHTML = `
                     <div class="text-center">
                         <strong>${info.event.title}</strong><br>
                         <span>${available}/5 Available</span><br>
                         <small>Click to book</small>
                     </div>
                 `;
+                }
             }
-        }
 
-        /* ========= LIST VIEW ========= */
-        if (viewType.startsWith('list')) {
-            const titleEl = info.el.querySelector('.fc-list-event-title');
-            if (!titleEl) return;
+            /* ========= LIST VIEW ========= */
+            if (viewType.startsWith('list')) {
+                const titleEl = info.el.querySelector('.fc-list-event-title');
+                if (!titleEl) return;
 
-            if (available === 0) {
-                titleEl.innerHTML = `<strong>${info.event.title}</strong> - Fully booked`;
-            } else if (available <= 2) {
-                titleEl.innerHTML = `<strong>${info.event.title}</strong> - ⚠️ Only ${available}/5 Available`;
-            } else {
-                titleEl.innerHTML = `<strong>${info.event.title}</strong> - ${available}/5 Available`;
+                if (available === 0) {
+                    titleEl.innerHTML = `<strong>${info.event.title}</strong>`;
+                } else if (available <= 2) {
+                    titleEl.innerHTML = `<strong>${info.event.title}</strong> - ⚠️ Only ${available}/5 Available`;
+                } else {
+                    titleEl.innerHTML = `<strong>${info.event.title}</strong> - ${available}/5 Available`;
+                }
             }
+        },
+
+        eventClick: function (info) {
+            const available = info.event.extendedProps.available || 0;
+            const disabled = info.event.extendedProps.disabled || false;
+
+            if (disabled || available === 0 || info.event.start < new Date()) {
+                alert('This slot cannot be booked.');
+                return;
+            }
+
+            if (info.view.type === 'dayGridMonth') {
+                calendar.changeView('timeGridDay', info.event.start);
+                return;
+            }
+
+            selected = info.event.start;
+            loadBeauticians();
         }
-    },
+    });
 
-    eventClick: function (info) {
-        const available = info.event.extendedProps.available || 0;
-        const disabled  = info.event.extendedProps.disabled || false;
-
-        if (disabled || available === 0 || info.event.start < new Date()) {
-            alert('This slot cannot be booked.');
-            return;
-        }
-
-        selected = info.event.start;
-        loadBeauticians();
-    }
-});
-
-calendar.render();
+    calendar.render();
 
 
     $('#confirmBooking').click(function () {

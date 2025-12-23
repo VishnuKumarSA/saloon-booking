@@ -17,16 +17,20 @@
 
 /* ========== MONTH VIEW ========== */
 .fc-daygrid-day {
-    min-height: 180px !important;
+    min-height: 90px !important;
+    padding: 2px;
+}
+
+.fc-daygrid-day-bottom {
+    margin-top: 2px;
 }
 
 .fc-daygrid-day-frame {
-    min-height: 180px !important;
-    height: auto !important;
+    min-height: 80px !important;
 }
 
 .fc-daygrid-day-events {
-    min-height: 140px !important;
+    min-height: 90px !important;
 }
 
 .fc-daygrid-event {
@@ -101,7 +105,7 @@
 
 .fc-list-event.available .fc-list-event-dot {
     border-color: #28a745 !important;
-    background-color: #28a745 !important;
+    background-color: #fff !important;
 }
 
 .fc-list-event.available .fc-list-event-title {
@@ -316,7 +320,8 @@
 }
 
 .fc-day-today {
-    background-color: #fffbe6 !important;
+    background-color: #fff8e1 !important;
+    border: 1px solid #ffe082;
 }
 
 .fc-event-title {
@@ -534,7 +539,121 @@
 /* =========================
    REMOVE SLOT BORDER BLEED
 ========================= */
-.holiday-bg ~ .fc-timegrid-slot-lane {
+.holiday-bg~.fc-timegrid-slot-lane {
     border-color: transparent !important;
 }
 
+/* WEEK / DAY */
+.holiday-label {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #b94a48;
+    font-weight: bold;
+    font-size: 18px;
+    opacity: 0.8;
+}
+
+/* MONTH */
+.holiday-label-month {
+    margin-top: 5px;
+    text-align: center;
+    color: #b94a48;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.fc-daygrid-event .fc-event-time {
+    display: none;
+}
+
+.fc-daygrid-event {
+    display: none;
+}
+
+.month-summary {
+    margin-top: 2px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.available-text {
+    color: #198754;
+}
+
+.holiday-text {
+    color: #dc3545;
+}
+
+.month-summary {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.available-text {
+    color: #198754;
+}
+
+.holiday-text {
+    color: #dc3545;
+}
+
+.fc-daygrid-event {
+    display: none;
+}
+
+.fc-day-past {
+    background-color: #f8f9fa;
+    opacity: 0.6;
+}
+
+/* Hide hourly slots in Month */
+.fc-daygrid-event {
+    display: none !important;
+}
+
+.month-summary {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.available-text {
+    color: #198754;
+}
+
+.holiday-text {
+    color: #dc3545;
+}
+
+.fc-day-past {
+    background-color: #f8f9fa;
+}
+
+.fc-view-harness {
+    min-height: auto !important;
+}
+
+.fc-dayGridMonth-view .fc-scrollgrid-sync-table {
+    height: auto !important;
+}
+
+.fc-dayGridMonth-view .fc-daygrid-day-frame {
+    min-height: 70px !important;
+    padding-bottom: 2px;
+}
+
+.fc-dayGridMonth-view .fc-daygrid-day-events {
+    min-height: 0 !important;
+}
+
+.month-summary {
+    margin-top: 2px;
+    font-size: 12px;
+    line-height: 1.2;
+}

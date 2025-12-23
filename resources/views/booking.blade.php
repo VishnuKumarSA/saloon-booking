@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-4">
-    <h4 class="mb-3">Weekly Booking</h4>
+    <h4 class="mb-3" id ='calendarTitle'> Booking</h4>
     <div id="calendar"></div>
 </div>
 

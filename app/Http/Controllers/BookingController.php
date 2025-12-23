@@ -29,9 +29,8 @@ class BookingController extends Controller
             if ($startDate->isFriday()) {
                 $events[] = [
                     'title' => 'Holiday',
-                    'start' => $startDate->copy()->setTime(9, 0)->format('Y-m-d\TH:i:s'),
-                    'end' => $startDate->copy()->setTime(18, 0)->format('Y-m-d\TH:i:s'),
-                    'display' => 'background',
+                    'start' => $startDate->copy()->setTime(7, 0)->format('Y-m-d\TH:i:s'),
+                    'end' => $startDate->copy()->setTime(22, 0)->format('Y-m-d\TH:i:s'),                  
                     'classNames' => ['holiday-bg'],
                     'extendedProps' => [
                         'holiday' => true,
@@ -43,7 +42,7 @@ class BookingController extends Controller
             }
 
             // Slots 9 AM – 6 PM
-            for ($hour = 9; $hour < 18; $hour++) {
+            for ($hour = 7; $hour < 22; $hour++) {
 
                 $slotDateTime = Carbon::create(
                     $startDate->year,
